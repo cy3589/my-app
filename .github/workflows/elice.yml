@@ -1,1 +1,36 @@
-
+name: Elice-Ci CD
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-lastest
+    
+    steps:
+    # 저장소의 파일 갖고옴. -> checkout
+    # Node.js 다운로드(버전지정)
+    # 의존성 다운로드(npm ci)
+    # 테스트 실행
+    # 배포
+      # 제작자,이름,버전 순서
+      - uses: actions/checkout@v2 
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Run test
+        run: npm test
+        
+      - name: Deploy to Heroku
+        uses: AkhileshNS/heroku-deploy@v3.12.12
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: "jcy3589@gmail.com"
+          # The appname to use for deploying/updating
+          heroku_app_name: "elicex5"
