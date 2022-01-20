@@ -1,28 +1,32 @@
-name: Elice-CI CD
+name: deploy
 
-on: 
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+on:
+  push: 
+    branches: [main]
 
 jobs:
-  test-and-deploy: 
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "14"
-      - name: Install Dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm test
-      - name: Deploy to Heroku
-        uses: AkhileshNS/heroku-deploy@v3.12.12
+      - name: checkout backend
+        uses: actions/checkout@v2
+      - name: checkout frontend
+        uses: actions/checkout@v2
         with: 
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          repository: couch-coding/heroku-actions-front
+          path: ./frontend
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: build frontend to resources
+        run: sh build.sh
+      - name: deploy to heroku
+        uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "elicex5" #Must be unique in Heroku
           heroku_email: "jcy3589@gmail.com"
-          heroku_app_name: "elicex5"
